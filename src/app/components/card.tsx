@@ -14,6 +14,7 @@ interface Product {
     }
 }
 
+
 const CardContent = async () => {
     const res = await fetch("https://openapi.programming-hero.com/api/bazardor/products");
     const data = await res.json();
@@ -46,7 +47,7 @@ const CardContent = async () => {
                                     <div className="flex justify-between items-center">
                                         <div>
                                             <p>আজকের দাম</p>
-                                            <p>{h.today} টাকা/কেজি</p>
+                                            <p>{h.today} টাকা/{(h.unit === "kg" ? "প্রতি কেজি" : h.unit === "piece" ? "প্রতি পিস" : h.unit === "dozen" ? "প্রতি ডজন" : h.unit === "litre" ? "প্রতি লিটার" : "")}</p>
                                         </div>
                                         <span className="2 text-red-600">
                                             ▲ {h.change.pct}%
@@ -86,7 +87,7 @@ const CardContent = async () => {
                                     <div className="flex justify-between items-center">
                                         <div>
                                             <p>আজকের দাম</p>
-                                            <p>{h.today} টাকা/কেজি</p>
+                                            <p>{h.today} টাকা/{(h.unit === "kg" ? "প্রতি কেজি" : h.unit === "piece" ? "প্রতি পিস" : h.unit === "dozen" ? "প্রতি ডজন" : h.unit === "litre" ? "প্রতি লিটার" : "")}</p>
                                         </div>
                                         <span className="2 text-green-600">
                                             ▼ {h.change.pct}%
@@ -125,7 +126,7 @@ const CardContent = async () => {
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <p>আজকের দাম</p>
-                                        <p>{h.today} টাকা/কেজি</p>
+                                            <p>{h.today} টাকা/{(h.unit === "kg" ? "প্রতি কেজি" : h.unit === "piece" ? "প্রতি পিস" : h.unit === "dozen" ? "প্রতি ডজন" : h.unit === "litre" ? "প্রতি লিটার" : "")}</p>
                                     </div>
                                     {h.change.dir === "up" ? <span className="2 text-red-600">
                                         ▲ {h.change.pct}%

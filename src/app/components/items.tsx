@@ -15,15 +15,15 @@ const items = async () => {
     const data = await res.json();
 
     return (
-        <div className="flex gap-5 justify-left mt-2">
+        <div className="mt-2 flex flex-wrap items-center justify-start gap-x-5 gap-y-1 md:-mx-4">
 
             {data.map((n: Navs) => (
                 <div key={n.slug} >
                     <div className="flex items-center text-sm font-semibold text-neutral-700 transition-colors hover:text-red-700">
-                        <span className="text-[15px] leading-none flex items-center justify-center h-10 w-10">
-                            {n.icon}
-                        </span>
-                        <Link href={`/category/${n.slug}`}>
+                        <Link href={`/Items/${n.slug}`} className="flex items-center">
+                            <span className="text-[15px] leading-none flex h-10 w-10 items-center justify-center">
+                                {n.icon}
+                            </span>
                             {n.nameBn}
                         </Link>
                     </div>
