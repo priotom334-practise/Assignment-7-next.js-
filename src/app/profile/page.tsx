@@ -29,6 +29,8 @@ const ProfilePage = () => {
             const imageData = reader.result as string;
             setCustomAvatar(imageData);
             window.localStorage.setItem("profileImage", imageData);
+            window.dispatchEvent(new Event("profile-avatar-updated"));
+            router.refresh();
         };
         reader.readAsDataURL(file);
     };

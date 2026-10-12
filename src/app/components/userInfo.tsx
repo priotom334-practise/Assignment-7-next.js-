@@ -22,13 +22,20 @@ const UserInfo = () => {
   });
 
   useEffect(() => {
-    const handleStorage = () => {
+    const syncAvatar = () => {
       const savedAvatar = window.localStorage.getItem("profileImage");
       setCustomAvatar(savedAvatar);
     };
 
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    syncAvatar();
+
+    window.addEventListener("storage", syncAvatar);
+    window.addEventListener("profile-avatar-updated", syncAvatar);
+
+    return () => {
+      window.removeEventListener("storage", syncAvatar);
+      window.removeEventListener("profile-avatar-updated", syncAvatar);
+    };
   }, []);
 
   const displayName = user?.name || "User";
