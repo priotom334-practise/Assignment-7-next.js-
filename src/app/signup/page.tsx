@@ -1,9 +1,10 @@
 "use client";
 import { authClient } from "@/app/lib/auth-client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 const SignUpPage = () => {
+    const router = useRouter();
 
     const onSubmit = async (e: React.SubmitEvent<HTMLElement>) => {
         e.preventDefault();
@@ -22,7 +23,7 @@ const SignUpPage = () => {
 
         if (data) {
             console.log(data);
-            redirect("/");
+            router.replace("/");
         }
 
         if (error) {
