@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
 
 interface Product {
     id: number;
@@ -113,4 +114,19 @@ const CategoryItems = async ({
     );
 };
 
-export default CategoryItems;
+export default function CategoryItemsPage(props:  {
+    params: Promise<{ categoryId: string }>;
+    searchParams: Promise<{ sort?: string | string[] }>;
+}) {
+    return (
+        <Suspense
+            fallback={
+                <div className="container mx-auto px-4 py-6 md:px-8">
+                    <p className="text-neutral-600">পণ্যের তথ্য লোড হচ্ছে...</p>
+                </div>
+            }
+        >
+            <CategoryItems {...props} />
+        </Suspense>
+    );
+}

@@ -19,7 +19,7 @@ async function DateLabel() {
 
 const NavPage = () => {
     return (<>
-        <header className="container mx-auto items-center bg-white border-b border-neutral-200 px-4 md:px-8">
+        <header className="container mx-auto border-b border-neutral-200 bg-white px-4">
             <div className="flex items-center justify-between py-4">
                 <div className="flex items-center gap-2">
                     <Image src="/logo-icon.png" alt="logo"
@@ -36,13 +36,11 @@ const NavPage = () => {
                     <UserInfo />
                 </div>
             </div>
-            <div>
-                <Suspense fallback="loading..." >
+            <div className="pb-2">
+                <Suspense fallback={<div className="h-10" aria-hidden="true" />}>
                     <Items />
                 </Suspense>
-
             </div>
-
         </header>
         <Suspense fallback={<div className="h-7" aria-hidden="true" />}>
             <Marquee />

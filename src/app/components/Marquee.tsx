@@ -27,11 +27,11 @@ const Marquee = async () => {
             {data.map((h: Product) => <Link className="hover:underline" href={`/categories/${h.id}`} key={h.id}>
                 <span className="mx-1">{h.image}</span>
                 <span className="mx-1">{h.nameBn}</span>
-                <span className="mx-2">{h.today} টাকা/কেজি</span>
+                <span className="mx-2">{h.today.toLocaleString("bn-BD")} টাকা/কেজি</span>
 
                 <span className={`mx-2 ${h.change.dir === "up" ? "text-green-600" : h.change.dir === "down" ? "text-red-600" : "text-gray-600"}`}>
                     {h.change.dir === "up" ? "▲ " : h.change.dir === "down" ? "▼" : ""}
-                    {h.change.pct}
+                    {h.change.pct.toLocaleString("bn-BD")}
                 </span>
             </Link>)}
 

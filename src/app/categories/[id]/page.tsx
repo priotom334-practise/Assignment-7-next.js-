@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 interface Product {
     id: number;
@@ -29,7 +30,7 @@ const unitNames: Record<string, string> = {
     litre: "লিটার",
 };
 
-export default async function ProductDetailsPage({
+async function ProductDetailsContent({
     params,
 }: {
     params: Promise<{ id: string }>;
@@ -49,7 +50,26 @@ export default async function ProductDetailsPage({
     }
 
     const unit = unitNames[product.unit] ?? product.unit;
-    const difference = product.today - product.yesterday;
+    const marketPriceSummary = product.markets.reduce(
+        (summary, market) => ({
+            lowest: Math.min(summary.lowest, market.min),
+            highest: Math.max(summary.highest, market.max),
+            averageTotal: summary.averageTotal + (market.min + market.max) / 2,
+            lowestMarket: summary.lowest <= market.min ? summary.lowestMarket : market.market,
+            highestMarket: summary.highest >= market.max ? summary.highestMarket : market.market,
+        }),
+        {
+            lowest: Infinity,
+            highest: -Infinity,
+            averageTotal: 0,
+            lowestMarket: "—",
+            highestMarket: "—",
+        },
+    );
+    const hasMarketPrices = product.markets.length > 0;
+    const averageMarketPrice = hasMarketPrices
+        ? marketPriceSummary.averageTotal / product.markets.length
+        : null;
     const isUp = product.change.dir === "up";
     const isDown = product.change.dir === "down";
     const changeColor = isUp ? "text-red-700" : isDown ? "text-green-700" : "text-neutral-600";
@@ -74,34 +94,42 @@ export default async function ProductDetailsPage({
                 </div>
                 <div className={`min-w-32 rounded-lg ${changeBg} px-4 py-3 sm:text-right`}>
                     <p className="text-xs text-neutral-600">আজকের দাম</p>
-                    <p className="text-xl font-bold text-neutral-900">{product.today} টাকা</p>
+                    <p className="text-xl font-bold text-neutral-900">{product.today.toLocaleString("bn-BD")} টাকা</p>
                     <p className={`mt-1 text-sm font-semibold ${changeColor}`}>
-                        {isUp ? "▲" : isDown ? "▼" : "−"} {product.change.pct}%
+                        {isUp ? "▲" : isDown ? "▼" : "−"} {product.change.pct.toLocaleString("bn-BD")}%
                     </p>
                 </div>
             </section>
 
             <section className="mt-5">
-                <h2 className="mb-3 text-lg font-bold text-neutral-900">দামের সারাংশ</h2>
+                <h2 className="mb-3 text-lg font-bold text-neutral-900">বাজারভিত্তিক দামের সারাংশ</h2>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                     <article className="rounded-lg border border-neutral-200 bg-white p-4">
-                        <p className="text-sm text-neutral-600">আজকের দাম</p>
-                        <p className="mt-2 text-xl font-bold text-neutral-900">{product.today} টাকা</p>
-                        <p className="mt-1 text-xs text-neutral-500">প্রতি {unit}</p>
+                        <p className="text-sm text-neutral-600">সর্বনিম্ন বাজারদর</p>
+                        <p className="mt-2 text-xl font-bold text-neutral-900">
+                            {hasMarketPrices ? marketPriceSummary.lowest.toLocaleString("bn-BD") : "—"} টাকা
+                        </p>
+                        <p className="mt-1 text-xs text-neutral-500">
+                            {hasMarketPrices ? `${marketPriceSummary.lowestMarket}` : "সব বাজারের মধ্যে"}
+                        </p>
                     </article>
                     <article className="rounded-lg border border-neutral-200 bg-white p-4">
-                        <p className="text-sm text-neutral-600">গতকালের দাম</p>
-                        <p className="mt-2 text-xl font-bold text-neutral-900">{product.yesterday} টাকা</p>
-                        <p className="mt-1 text-xs text-neutral-500">প্রতি {unit}</p>
+                        <p className="text-sm text-neutral-600">সর্বোচ্চ বাজারদর</p>
+                        <p className="mt-2 text-xl font-bold text-neutral-900">
+                            {hasMarketPrices ? marketPriceSummary.highest.toLocaleString("bn-BD") : "—"} টাকা
+                        </p>
+                        <p className="mt-1 text-xs text-neutral-500">
+                            {hasMarketPrices ? `${marketPriceSummary.highestMarket}`  : "সব বাজারের মধ্যে"}
+                        </p>
                     </article>
                     <article className="rounded-lg border border-neutral-200 bg-white p-4">
-                        <p className="text-sm text-neutral-600">দামের পরিবর্তন</p>
-                        <p className={`mt-2 text-xl font-bold ${changeColor}`}>
-                            {difference > 0 ? "+" : ""}{difference} টাকা
+                        <p className="text-sm text-neutral-600">গড় বাজারদর</p>
+                        <p className="mt-2 text-xl font-bold text-neutral-900">
+                            {averageMarketPrice === null
+                                ? "—"
+                                : averageMarketPrice.toLocaleString("bn-BD", { maximumFractionDigits: 1 })} টাকা
                         </p>
-                        <p className={`mt-1 text-xs ${changeColor}`}>
-                            {isUp ? "আজ দাম বেড়েছে" : isDown ? "আজ দাম কমেছে" : "দামের পরিবর্তন নেই"} ({product.change.pct}%)
-                        </p>
+                        <p className="mt-1 text-xs text-neutral-500">প্রতি {unit}, বাজারগুলোর গড়</p>
                     </article>
                 </div>
             </section>
@@ -112,7 +140,7 @@ export default async function ProductDetailsPage({
                     <table className="w-full min-w-155 border-collapse text-sm">
                         <thead>
                             <tr className="bg-neutral-50 text-left text-neutral-600">
-                                <th scope="col" className="border border-neutral-200 px-3 py-2">বাজার</th>
+                                <th scope="col" className="border border-neutral-200 px-3 py-2">বাজারের নাম</th>
                                 <th scope="col" className="border border-neutral-200 px-3 py-2">বিভাগ</th>
                                 <th scope="col" className="border border-neutral-200 px-3 py-2 text-right">সর্বনিম্ন</th>
                                 <th scope="col" className="border border-neutral-200 px-3 py-2 text-right">সর্বাধিক</th>
@@ -142,5 +170,23 @@ export default async function ProductDetailsPage({
                 </div>
             </section>
         </main>
+    );
+}
+
+export default function ProductDetailsPage({
+    params,
+}: {
+    params: Promise<{ id: string }>;
+}) {
+    return (
+        <Suspense
+            fallback={
+                <main className="container mx-auto max-w-5xl px-4 py-6 md:px-8">
+                    <p className="text-neutral-600">পণ্যের তথ্য লোড হচ্ছে...</p>
+                </main>
+            }
+        >
+            <ProductDetailsContent params={params} />
+        </Suspense>
     );
 }
