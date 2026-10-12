@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import SortSelector from "./SortSelector";
 
 interface Product {
     id: number;
@@ -27,11 +28,17 @@ const CategoryItems = async ({
     const data1 = await res.json();
 
     if (!data1) {
-        notFound()
+        notFound();
     }
 
     const res2 = await fetch("https://openapi.programming-hero.com/api/bazardor/categories");
     const data2 = await res2.json();
+    const categoryExists = data2.some((category: Product) => category.slug === categoryId);
+
+    if (!categoryExists) {
+        notFound();
+    }
+
     const sortedProducts = [...data1].sort((a: { today: number }, b: { today: number }) =>
         sortOrder === "high-to-low" ? b.today - a.today : a.today - b.today,
     );
@@ -54,21 +61,9 @@ const CategoryItems = async ({
 
             <section className="flex items-center justify-between gap-4 rounded-lg border border-neutral-200 bg-white px-4 py-3">
                 <p className="text-sm text-neutral-600">মোট {data1.length.toLocaleString("bn-BD")}টি পণ্য</p>
-                <form action={`/Items/${categoryId}`} method="get" className="flex items-center gap-2">
-                    <label htmlFor="sort" className="text-sm text-neutral-600">দাম</label>
-                    <select
-                        id="sort"
-                        name="sort"
-                        defaultValue={sortOrder}
-                        className="rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-800 outline-none focus:border-green-600"
-                    >
-                        <option value="low-to-high">কম থেকে বেশি</option>
-                        <option value="high-to-low">বেশি থেকে কম</option>
-                    </select>
-                    <button type="submit" className="rounded-md bg-green-700 px-3 py-2 text-sm font-semibold text-white hover:bg-green-800">
-                        সাজান
-                    </button>
-                </form>
+                <Suspense fallback={<div className="text-sm text-neutral-500">সাজানো হচ্ছে...</div>}>
+                    <SortSelector categoryId={categoryId} currentSort={sortOrder} />
+                </Suspense>
             </section>
 
             {data1.length === 0 ? (
@@ -114,7 +109,7 @@ const CategoryItems = async ({
     );
 };
 
-export default function CategoryItemsPage(props:  {
+export default function CategoryItemsPage(props: {
     params: Promise<{ categoryId: string }>;
     searchParams: Promise<{ sort?: string | string[] }>;
 }) {
