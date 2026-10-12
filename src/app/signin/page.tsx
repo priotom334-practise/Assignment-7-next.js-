@@ -1,9 +1,27 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/app/lib/auth-client";
 import toast from "react-hot-toast";
 
 const SignInPage = () => {
+    const router = useRouter();
+    const { data: session, isPending } = authClient.useSession();
+
+    useEffect(() => {
+        if (!isPending && session) {
+            router.replace("/");
+        }
+    }, [session, isPending, router]);
+
+    if (isPending) {
+        return <div className="flex min-h-[70vh] items-center justify-center">Loading...</div>;
+    }
+
+    if (session) {
+        return null;
+    }
 
     const onSubmit = async (e: React.SubmitEvent<HTMLElement>) => {
         e.preventDefault();
