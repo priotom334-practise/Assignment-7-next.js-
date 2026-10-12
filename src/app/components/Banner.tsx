@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { authClient } from "@/app/lib/auth-client";
 
@@ -75,9 +76,12 @@ const Banner = () => {
                         চাল, ডাল, তেল, সবজি, মাছ, মাংস, ডিম ও মসলার দাম — বাজারভিত্তিক বিস্তারিত, গড়, সর্বনিম্ন-
                         সর্বাধিক এবং দামের পরিবর্তন এক জায়গায়।
                     </p>
-                    <button className="w-fit rounded bg-green-500 px-4 py-2 text-white transition hover:bg-green-600">
+                    <Link
+                        href="/#all-products"
+                        className="w-fit rounded bg-green-500 px-4 py-2 text-white transition hover:bg-green-600"
+                    >
                         সব পন্য দেখুন
-                    </button>
+                    </Link>
                 </div>
 
                 {isLoggedIn ? (

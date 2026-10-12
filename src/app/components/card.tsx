@@ -100,7 +100,7 @@ const CardContent = async () => {
 
             </div>
 
-            <div className="container mx-auto px-4 md:px-8 py-4 flex flex-col gap-6">
+            <div id="all-products" className="container mx-auto px-4 md:px-8 py-4 flex flex-col gap-6 scroll-mt-24">
                 <div>
                     <h2 className="font-bold text-2xl">সব পণ্য</h2>
                     <p className="">মোট ৩৩টি পণ্য দেখানো হচ্ছে</p>
